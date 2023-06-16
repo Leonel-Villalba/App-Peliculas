@@ -2,23 +2,25 @@ import { useEffect, useState } from "react";
 import { MovieCard } from "./MovieCard";
 // import movies from "./movies.json";
 import styles from "./MoviesGrid.module.css";
+import { get } from "../utils/httpClient";
+import { Spinner } from "./Spinner";
 
 export function MoviesGrid() {
   const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://api.themoviedb.org/3/discover/movie", {
-      headers:{
-        Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMmQ5M2IxMmNhMWM3MzI2NDNjNDcyOGU5MDU4MmIxYSIsInN1YiI6IjY0N2YzMWM5MGUyOWEyMmJlMWYxMjkxNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.RwFO0dw0k4FwNGt-SkgiSVfxDmnpGmUarzQvNGkwAJA",
-      "Content-Type": "application/json;charset=utf-8",
-      },
-    })
-      .then((result) => result.json())
+    setIsLoading(true)
+    get("/discover/movie")
       .then((data) => {
         setMovies(data.results);
+        setIsLoading(false)
     });
-
   }, []);
+  if(isLoading){
+    return <Spinner/>;
+  }
+
   return (
     <ul className={styles.moviesGrid}>
       {movies.map((movie) => (
